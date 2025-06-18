@@ -1006,7 +1006,7 @@
 
       function checkout() {
         if (cart.length === 0) {
-          alert("Keranjang belanja kosong!");
+          showToast("Keranjang belanja kosong!");
           return;
         }
         const cartItemsCount = {};
@@ -1015,21 +1015,28 @@
           cartItemsCount[item.id] = (cartItemsCount[item.id] || 0) + 1;
           total += item.price;
         });
-        let message = "Pesanan Baru:%0A";
-        message += "------------------%0A";
+        let message = "Pesanan Baru:\n";
+        message += "------------------\n";
         for (const [id, quantity] of Object.entries(cartItemsCount)) {
           const item = products.find((p) => p.id == id);
           message += `${item.name} (x${quantity}): Rp ${(
             item.price * quantity
-          ).toLocaleString()}%0A`;
+          ).toLocaleString()}\n`;
         }
-        message += "------------------%0A";
-        message += `Total: Rp ${total.toLocaleString()}%0A`;
+        message += "------------------\n";
+        message += `Total: Rp ${total.toLocaleString()}\n`;
         message += "Terima kasih atas pesanannya!";
-        const whatsappNumber = "6287876480267"; // Ganti dengan nomor WhatsApp Anda
+
+        // Opsional: Bersihkan karakter non-ASCII
+        message = message.replace(/[^\x00-\x7F]/g, "");
+
+        const whatsappNumber = "6287876480267";
         const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
           message
         )}`;
+
+        console.log("WhatsApp URL:", whatsappUrl);
+
         window.open(whatsappUrl, "_blank");
         cart = [];
         updateCart();
@@ -1038,17 +1045,36 @@
 
       document.getElementById("contactForm").addEventListener("submit", (e) => {
         e.preventDefault();
-        const name = document.getElementById("name").value;
-        const email = document.getElementById("email").value;
-        const message = document.getElementById("message").value;
-        const whatsappNumber = "6287876480267"; // Ganti dengan nomor WhatsApp Anda
-        const contactMessage = `Pesan Kontak Baru:%0A-----------------%0ANama: ${name}%0AEmail: ${email}%0APesan: ${message}%0A-----------------%0ATerima kasih!`;
+        const name = document.getElementById("name").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const message = document.getElementById("message").value.trim();
+
+        if (!name || !email || !message) {
+          showToast("Harap isi semua kolom!");
+          return;
+        }
+
+        let contactMessage = "Pesan Kontak Baru:\n";
+        contactMessage += "------------------\n";
+        contactMessage += `Nama: ${name}\n`;
+        contactMessage += `Email: ${email}\n`;
+        contactMessage += `Pesan: ${message}\n`;
+        contactMessage += "------------------\n";
+        contactMessage += "Terima kasih!";
+
+        // Opsional: Bersihkan karakter non-ASCII
+        contactMessage = contactMessage.replace(/[^\x00-\x7F]/g, "");
+
+        const whatsappNumber = "6287876480267";
         const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
           contactMessage
         )}`;
+
+        console.log("WhatsApp Contact URL:", whatsappUrl);
+
         window.open(whatsappUrl, "_blank");
         document.getElementById("contactForm").reset();
-        alert("Pesan telah dikirim melalui WhatsApp!");
+        showToast("Pesan telah dikirim melalui WhatsApp!");
       });
 
       document.getElementById("search-input").addEventListener("input", (e) => {
